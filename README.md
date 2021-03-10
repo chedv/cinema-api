@@ -9,8 +9,8 @@ python3.8 -m pip install pipenv
 Clone project:
 
 ```shell script
-git clone https://github.com/chedv/fastapi-auth.git
-cd fastapi-auth
+git clone https://github.com/chedv/cinema-api.git
+cd cinema-api
 ```
 
 Configure vscode settings.json:
