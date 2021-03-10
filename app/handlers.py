@@ -1,4 +1,6 @@
-from fastapi import Request, status
+import functools
+from typing import Type
+from fastapi import Request, status, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 

@@ -5,7 +5,8 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from ..database import models, users
+from ..database import models
+from ..database.access import users
 from settings import settings
 
 

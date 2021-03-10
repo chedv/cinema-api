@@ -1,1 +1,2 @@
-from .auth import UserRegistration, UserLogin
+from .auth import UserRegistrationSchema, UserLoginSchema
+from .cinema import CinemaSchema

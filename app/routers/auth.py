@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from ..dependencies import get_db_session
-from ..schemas import UserRegistration, UserLogin
-from ..database.users import create_user
+from ..schemas import UserRegistrationSchema, UserLoginSchema
+from ..database.access.users import create_user
+from ..utils.dependencies import get_db_session
 from ..utils.auth import authenticate, create_access_token
 
 
@@ -12,18 +12,18 @@ auth_router = APIRouter(prefix='/auth', tags=['auth'])
 
 
 @auth_router.post('/register', status_code=status.HTTP_201_CREATED)
-def user_register(user: UserRegistration = Depends(UserRegistration.as_form),
+def register_user(user: UserRegistrationSchema = Depends(UserRegistrationSchema.as_form),
                   db_session: Session = Depends(get_db_session)):
     try:
-        user = create_user(db_session, user, user_role='client')
+        user_model = create_user(db_session, user, user_role='client')
     except IntegrityError:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY,
                             detail='User with specified parameters already exists')
-    return {'user_uuid': user.id}
+    return {'user_uuid': user_model.id}
 
 
-@auth_router.post('/login', status_code=status.HTTP_200_OK)
-def user_login(user: UserLogin = Depends(UserLogin.as_form),
+@auth_router.post('/login')
+def login_user(user: UserLoginSchema = Depends(UserLoginSchema.as_form),
                db_session: Session = Depends(get_db_session)):
     user_model = authenticate(db_session, user.email, user.raw_password)
     if not user_model:

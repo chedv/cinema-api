@@ -1,8 +1,47 @@
 import inspect
 from typing import Type
+from string import ascii_lowercase, ascii_uppercase, punctuation, digits
 from pydantic import BaseModel
 from pydantic.fields import ModelField
 from fastapi import Form
+
+
+lowercase_letters = set(ascii_lowercase)
+uppercase_letters = set(ascii_uppercase)
+special_chars = set(punctuation)
+digit_chars = set(digits)
+
+valid_name_chars = set(ascii_lowercase + ' ')
+valid_address_chars = set(ascii_lowercase + digits + ' ,')
+
+
+def validate_name(cls, v):
+    if v is None:
+        return v
+    if any(char.lower() not in valid_name_chars for char in v):
+        raise ValueError('Name must contain only letters and white spaces')
+    return v
+
+
+def validate_address(cls, v):
+    if v is None:
+        return v
+    if any(char.lower() not in valid_address_chars for char in v):
+        raise ValueError('Address must contain only letters, digits, commas and white spaces')
+    return v
+
+
+def validate_password(cls, v):
+    min_len = 8
+    if len(v) < min_len:
+        raise ValueError('Password must contain at least eight characters')
+    if all(char not in uppercase_letters for char in v):
+        raise ValueError('Password must contain at least one uppercase letter')
+    if all(char not in digit_chars for char in v):
+        raise ValueError('Password must contain at least one digit')
+    if all(char not in special_chars for char in v):
+        raise ValueError('Password must contain at least one special character')
+    return v
 
 
 def as_form(cls: Type[BaseModel]):
