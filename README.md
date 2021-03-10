@@ -33,6 +33,7 @@ Configure vscode settings.json:
 Create virtual environment and install dependencies:
 
 ```shell script
+export PIPENV_VENV_IN_PROJECT=1
 pipenv install --python 3.8
 pipenv shell
 ```
