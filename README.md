@@ -53,6 +53,12 @@ DB_ECHO=true
 JWT_SECRET=<key>
 ```
 
+Generate JWT secret key:
+
+```shell script
+openssl rand -hex 32
+```
+
 Run project:
 
 ```shell script
