@@ -19,7 +19,14 @@ Configure vscode settings.json:
 {
     "python.pythonPath": "/path/to/project/.venv/bin/python3.8",
     "python.linting.pylintEnabled": true,
-    "python.linting.pycodestyleEnabled": true
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.pycodestyleArgs": ["--max-line-length=120"],
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true
 }
 ```
 
