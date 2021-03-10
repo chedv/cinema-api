@@ -31,6 +31,14 @@ def validate_address(cls, v):
     return v
 
 
+def validate_duration(cls, v):
+    if v is None:
+        return v
+    if v <= 0 or v > 500:
+        raise ValueError('Duration value is out of range')
+    return v
+
+
 def validate_password(cls, v):
     min_len = 8
     if len(v) < min_len:

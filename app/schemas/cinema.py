@@ -1,3 +1,4 @@
+from uuid import UUID
 from pydantic import BaseModel, Field, validator
 
 from .base import validate_name, validate_address
@@ -13,3 +14,7 @@ class CinemaSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class CinemaOutputSchema(CinemaSchema):
+    id: UUID
