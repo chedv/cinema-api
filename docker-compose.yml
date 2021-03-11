@@ -1,0 +1,18 @@
+services:
+  web:
+    image: chedv001/cinema-api
+    command: pipenv run python run.py
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  db:
+    image: postgres
+    env_file: database.conf
+    ports:
+      - "50432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+volumes:
+  pg_data:
+    external: true
