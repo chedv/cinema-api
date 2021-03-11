@@ -6,8 +6,8 @@ from fastapi import APIRouter, status, Depends, HTTPException
 
 from ..schemas import CinemaSchema, CinemaOutputSchema
 from ..database.access import cinemas
-from ..utils.dependencies import get_db_session
-from ..utils.auth import oauth2_schema
+from ..database import models
+from ..utils.dependencies import get_db_session, get_current_user
 
 
 cinema_router = APIRouter(tags=['cinema'])
@@ -15,7 +15,7 @@ cinema_router = APIRouter(tags=['cinema'])
 
 @cinema_router.post('/cinemas', status_code=status.HTTP_201_CREATED)
 def create_cinema(cinema: CinemaSchema,
-                  token: str = Depends(oauth2_schema),
+                  user: models.User = Depends(get_current_user),
                   db_session: Session = Depends(get_db_session)):
     try:
         cinema_model = cinemas.create_cinema(db_session, cinema)

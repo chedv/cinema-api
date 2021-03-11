@@ -10,6 +10,9 @@ from ..database.access import users
 from settings import settings
 
 
+oauth2_schema = OAuth2PasswordBearer(tokenUrl='token')
+
+
 class PasswordContext:
     context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -30,13 +33,13 @@ def authenticate(db_session: Session, email: str, raw_password: str) -> Optional
 
 
 def create_access_token(user: models.User, expire_minutes: int = 30) -> str:
-    encode_data = {'sub': user.email, 'exp': datetime.now() + timedelta(minutes=expire_minutes)}
+    encode_data = {'sub': user.email, 'exp': datetime.utcnow() + timedelta(minutes=expire_minutes)}
     return jwt.encode(encode_data, settings.jwt_secret, algorithm='HS256')
 
 
-def get_current_user(db_session: Session, token: str) -> Optional[models.User]:
-    decoded_data = jwt.decode(token, settings.jwt_secret, algorithms=['HS256'])
-    return users.get_user_by_email(db_session, decoded_data['email'])
-
-
-oauth2_schema = OAuth2PasswordBearer(tokenUrl='token')
+def decode_access_token(db_session: Session, token: str) -> Optional[models.User]:
+    try:
+        decoded_data = jwt.decode(token, settings.jwt_secret, algorithms=['HS256'])
+    except jwt.PyJWTError as exc:
+        return
+    return users.get_user_by_email(db_session, decoded_data['sub'])

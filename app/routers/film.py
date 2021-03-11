@@ -6,8 +6,8 @@ from fastapi import APIRouter, status, Depends, HTTPException
 
 from ..schemas import FilmSchema, FilmOutputSchema
 from ..database.access import films
-from ..utils.dependencies import get_db_session
-from ..utils.auth import oauth2_schema
+from ..database import models
+from ..utils.dependencies import get_db_session, get_current_user
 
 
 film_router = APIRouter(tags=['film'])
@@ -15,9 +15,8 @@ film_router = APIRouter(tags=['film'])
 
 @film_router.post('/films', status_code=status.HTTP_201_CREATED)
 def create_film(film: FilmSchema,
-                token: str = Depends(oauth2_schema),
+                user: models.User = Depends(get_current_user),
                 db_session: Session = Depends(get_db_session)):
-    print(token)
     try:
         film_model = films.create_film(db_session, film)
     except IntegrityError:

@@ -1,55 +1,42 @@
 import inspect
-from typing import Type
+from typing import Type, Optional, Set
 from string import ascii_lowercase, ascii_uppercase, punctuation, digits
 from pydantic import BaseModel
 from pydantic.fields import ModelField
 from fastapi import Form
 
 
-lowercase_letters = set(ascii_lowercase)
-uppercase_letters = set(ascii_uppercase)
-special_chars = set(punctuation)
-digit_chars = set(digits)
+lowercases_whitespace = set(ascii_lowercase + ' ')
+lowercases_digits_whitespace = set(ascii_lowercase + digits + ' ')
+lowercases_digits_whitespace_comma = set(ascii_lowercase + digits + ' ,')
 
-valid_name_chars = set(ascii_lowercase + ' ')
-valid_address_chars = set(ascii_lowercase + digits + ' ,')
-
-
-def validate_name(cls, v):
-    if v is None:
-        return v
-    if any(char.lower() not in valid_name_chars for char in v):
-        raise ValueError('Name must contain only letters and white spaces')
-    return v
+lowercases = set(ascii_lowercase)
+uppercases = set(ascii_uppercase)
+specials = set(punctuation)
+digits = set(digits)
 
 
-def validate_address(cls, v):
-    if v is None:
-        return v
-    if any(char.lower() not in valid_address_chars for char in v):
-        raise ValueError('Address must contain only letters, digits, commas and white spaces')
-    return v
+def validate_string(v: str, valid_chars: Set[str], error_msg: str):
+    if any(char.lower() not in valid_chars for char in v):
+        raise ValueError(error_msg)
 
 
-def validate_duration(cls, v):
-    if v is None:
-        return v
-    if v <= 0 or v > 500:
-        raise ValueError('Duration value is out of range')
-    return v
+def validate_range(v: int, left: Optional[int] = None, right: Optional[int] = None) -> None:
+    if (left is not None and v < left) or (right is not None and v > right):
+        raise ValueError('Value is out of range')
 
 
-def validate_password(cls, v):
-    min_len = 8
-    if len(v) < min_len:
+def validate_password(v: str, **kwargs) -> None:
+    min_length = kwargs.get('min_length')
+
+    if min_length and len(v) < min_length:
         raise ValueError('Password must contain at least eight characters')
-    if all(char not in uppercase_letters for char in v):
+    if kwargs.get('uppercase') and all(char not in uppercases for char in v):
         raise ValueError('Password must contain at least one uppercase letter')
-    if all(char not in digit_chars for char in v):
+    if kwargs.get('digit') and all(char not in digits for char in v):
         raise ValueError('Password must contain at least one digit')
-    if all(char not in special_chars for char in v):
+    if kwargs.get('special') and all(char not in specials for char in v):
         raise ValueError('Password must contain at least one special character')
-    return v
 
 
 def as_form(cls: Type[BaseModel]):
